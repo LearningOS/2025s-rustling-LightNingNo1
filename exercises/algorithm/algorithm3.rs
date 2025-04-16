@@ -3,10 +3,22 @@
 	This problem requires you to implement a sorting algorithm
 	you can use bubble sorting, insertion sorting, heap sorting, etc.
 */
-// I AM NOT DONE
 
-fn sort<T>(array: &mut [T]){
-	//TODO
+
+fn sort<T>(array: &mut [T])
+where
+    T : Clone + std::cmp::PartialOrd
+{
+	let length = array.len().saturating_sub(1);
+    for right in (1..=length).rev() {
+        for i in 0..right{
+            if array[i] > array[i+1]{
+                let temp = array[i].clone();
+                array[i] = array[i+1].clone();
+                array[i+1] = temp;
+            }
+        }
+    }
 }
 #[cfg(test)]
 mod tests {

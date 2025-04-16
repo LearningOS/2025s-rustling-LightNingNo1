@@ -2,7 +2,7 @@
 	heap
 	This question requires you to implement a binary heap function
 */
-// I AM NOT DONE
+
 
 use std::cmp::Ord;
 use std::default::Default;
@@ -36,8 +36,20 @@ where
         self.len() == 0
     }
 
-    pub fn add(&mut self, value: T) {
-        //TODO
+    pub fn add(&mut self, value: T) 
+    where
+        T : Clone,
+    {
+        self.items.push(value);
+        self.count+=1;
+        let mut now_idx = self.count.clone();
+        let mut paridx = self.parent_idx(now_idx);
+        
+        while paridx > 0 && (self.comparator)(&self.items[now_idx],&self.items[paridx]){
+            self.items.swap(now_idx,paridx);
+            now_idx = paridx;
+            paridx = self.parent_idx(now_idx);
+        }
     }
 
     fn parent_idx(&self, idx: usize) -> usize {
@@ -57,8 +69,18 @@ where
     }
 
     fn smallest_child_idx(&self, idx: usize) -> usize {
-        //TODO
-		0
+        let left = self.left_child_idx(idx);
+        let right = self.right_child_idx(idx);
+        if left > self.count {
+            return idx; 
+        }
+        if right > self.count {
+            left
+        } else if (self.comparator)(&self.items[right], &self.items[left]) {
+            right
+        } else {
+            left
+        }
     }
 }
 
@@ -79,13 +101,32 @@ where
 
 impl<T> Iterator for Heap<T>
 where
-    T: Default,
+    T: Default + Clone,
 {
     type Item = T;
 
     fn next(&mut self) -> Option<T> {
-        //TODO
-		None
+        if self.is_empty() {
+            return None;
+        }
+
+        let result = self.items[1].clone(); 
+        self.items[1] = self.items[self.count].clone(); 
+        self.items.pop(); 
+        self.count -= 1;
+
+        let mut idx = 1;
+        while self.children_present(idx) {
+            let child_idx = self.smallest_child_idx(idx);
+            if (self.comparator)(&self.items[child_idx], &self.items[idx]) {
+                self.items.swap(child_idx, idx);
+                idx = child_idx;
+            } else {
+                break;
+            }
+        }
+
+        Some(result)
     }
 }
 
